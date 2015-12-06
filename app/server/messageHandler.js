@@ -1,4 +1,5 @@
-var  connectedPeers = {};
+var connectedPeers = {};
+var nextPeerId = 0;
 function onMessage(ws, message){
     var type = message.type;
     switch (type) {
@@ -12,14 +13,16 @@ function onMessage(ws, message){
             onAnswer(message.answer, message.destination, ws.id);
             break;
         case "init":
-            onInit(ws, message.init);
+            onInit(ws);
             break;
         default:
             throw new Error("invalid message type");
     }
 }
 
-function onInit(ws, id){
+function onInit(ws){
+    var id = nextPeerId;
+    nextPeerId++;
     console.log("init from peer:", id);
     ws.id = id;
     connectedPeers[id] = ws;
