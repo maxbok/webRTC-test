@@ -31,6 +31,12 @@ function onInit(ws){
     console.log("init from peer:", id);
     ws.id = id;
     connectedPeers[id] = ws;
+
+    message = {};
+    message.type = "attest_registration";
+    message.peerId = id;
+    message.otherPeers = Object.keys(connectedPeers);
+    ws.send(JSON.stringify(message));
 }
 
 function onOffer(offer, destination, source){
