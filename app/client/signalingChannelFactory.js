@@ -1,4 +1,4 @@
-function SignalingChannel(id){
+function SignalingChannel(){
 
     var _ws;
     var self = this;
@@ -12,7 +12,7 @@ function SignalingChannel(id){
     }
 
     function _onConnectionEstablished(){
-        _sendMessage('init', id);
+        _sendMessage('init');
     }
 
     function _onClose(){
@@ -23,10 +23,12 @@ function SignalingChannel(id){
         console.error("error:", err);
     }
 
-
     function _onMessage(evt){
         var objMessage = JSON.parse(evt.data);
         switch (objMessage.type) {
+            case "attest_registration":
+                self.onAttestRegistration(objMessage.peerId, objMessage.otherPeers);
+                break;
             case "ICECandidate":
                 self.onICECandidate(objMessage.ICECandidate, objMessage.source);
                 break;
@@ -59,13 +61,17 @@ function SignalingChannel(id){
 
     function sendAnswer(answer, destination){
         _sendMessage("answer", answer, destination);
-        
     }
 
     this.connectToTracker = connectToTracker;
     this.sendICECandidate = sendICECandidate;
     this.sendOffer = sendOffer;
     this.sendAnswer = sendAnswer;
+
+    //default handler, should be overriden 
+    this.onAttestRegistration = function(id, peers) {
+        console.log("Attest registration");
+    };
 
     //default handler, should be overriden 
     this.onOffer = function(offer, source){
@@ -83,8 +89,9 @@ function SignalingChannel(id){
     };
 }
 
-window.createSignalingChannel = function(url, id){
-    var signalingChannel = new SignalingChannel(id);
+window.createSignalingChannel = function(url){
+    var signalingChannel = new SignalingChannel();
     signalingChannel.connectToTracker(url);
     return signalingChannel;
 };
+
