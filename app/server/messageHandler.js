@@ -1,5 +1,6 @@
 var connectedPeers = {};
 var nextPeerId = 0;
+
 function onMessage(ws, message){
     var type = message.type;
     switch (type) {
@@ -18,6 +19,10 @@ function onMessage(ws, message){
         default:
             throw new Error("invalid message type");
     }
+}
+
+function onClose(ws) {
+    delete connectedPeers[ws.id];
 }
 
 function onInit(ws){
@@ -55,7 +60,8 @@ function onICECandidate(ICECandidate, destination, source){
     }));
 }
 
-module.exports = onMessage;
+module.exports.onMessage = onMessage;
+module.exports.onClose = onClose;
 
 //exporting for unit tests only
 module.exports._connectedPeers = connectedPeers;
