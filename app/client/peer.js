@@ -8,12 +8,22 @@ function Peer() {
 
     signalingChannel.onAttestRegistration = function (id, peers) {
         self.onRegistration(id);
-        for (i = 0; i < peers.length; i++) {
-            var peerId = peers[i];
-            if (peerId != id) {
-                startCommunication(peerId);
+
+        if (peers.length > 0) {
+            var index = 0;
+            var startCommunicationLoop = function(ids) {
+                startCommunication(ids[index], function() {
+                    index++;
+
+                    if (index < ids.length) {
+                        startCommunicationLoop(ids);
+                    }
+                });
             }
+
+            startCommunicationLoop(peers);
         }
+
     };
 
     signalingChannel.onOffer = function (offer, source) {
@@ -29,7 +39,7 @@ function Peer() {
         });
     };
 
-    function startCommunication(peerId) {
+    function startCommunication(peerId, completion) {
         var pc = new PeerConnection(signalingChannel, peerId);
 
         signalingChannel.onAnswer = function (answer, source) {
@@ -61,29 +71,31 @@ function Peer() {
 
         channel.onopen = function(){
             console.log("dataChannel opened");
+            completion();
             self.onChannelOpened(peerId, channel);
         };
 
         channel.onmessage = function(message){
             self.onMessageReceived(peerId, message.data);
         };
+
     }
 
     function createPeerConnection(peerId){
         var pc = PeerConnection(signalingChannel, peerId);
 
         pc.ondatachannel = function(event) {
-          var channel = event.channel;
-          console.log("channel received");
-          self.onChannelOpened(peerId, channel);
+            var channel = event.channel;
+            console.log("channel received");
+            self.onChannelOpened(peerId, channel);
 
-          channel.onmessage = function(event){
-              self.onMessageReceived(peerId, event.data);
-          };
+            channel.onmessage = function(event){
+                self.onMessageReceived(peerId, event.data);
+            };
 
-          channel.onclose = function(evt) {
-              self.onChannelClosed(peerId);
-          };
+            channel.onclose = function(evt) {
+                self.onChannelClosed(peerId);
+            };
         };
 
         return pc;
