@@ -13,6 +13,7 @@
             peer.onChannelOpened = function(peerId, channel) {
               var titleRow = document.getElementById("title_row");
               var titleCell = titleRow.insertCell();
+              titleCell.width = "130px";
               titleCell.innerHTML = "Peer " + peerId;
 
               var sendRow = document.getElementById("send_row");
@@ -41,7 +42,6 @@
 <body>
     <h2>Peer page</h2>
     <table id="channels">
-      <col width="160">
       <tr id="title_row"></tr>
       <tr id="send_row"></tr>
     </table>
