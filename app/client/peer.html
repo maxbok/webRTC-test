@@ -10,6 +10,11 @@
         window.addEventListener("load", function() {
             var peer = new Peer();
 
+            peer.onRegistration = function(id) {
+              var title = document.getElementById("peer_title");
+              title.innerHTML = "Peer " + id;
+            };
+
             peer.onChannelOpened = function(peerId, channel) {
               var titleRow = document.getElementById("title_row");
               var titleCell = titleRow.insertCell();
@@ -40,7 +45,7 @@
     </script>
 </head>
 <body>
-    <h2>Peer page</h2>
+    <h2 id="peer_title">Peer page</h2>
     <table id="channels">
       <tr id="title_row"></tr>
       <tr id="send_row"></tr>

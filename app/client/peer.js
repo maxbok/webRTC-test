@@ -66,6 +66,7 @@ function Peer() {
     }
 
     signalingChannel.onAttestRegistration = function (id, peers) {
+        self.onRegistration(id);
         for (i = 0; i < peers.length; i++) {
             var peerId = peers[i];
             if (peerId != id) {
@@ -117,6 +118,11 @@ function Peer() {
         }, function (e){
             console.error(e);
         });
+    };
+
+    //default handler, should be overriden 
+    this.onRegistration = function(id) {
+        console.log("on registration");
     };
 
     //default handler, should be overriden 
