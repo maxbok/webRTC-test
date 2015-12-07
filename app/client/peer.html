@@ -19,10 +19,6 @@
               var sendCell = sendRow.insertCell();
               sendCell.id = "send_" + peerId;
 
-              var messageRow = document.getElementById("message_row");
-              var messageCell = messageRow.insertCell();
-              messageCell.id = "messages_" + peerId;
-
               createSendForm(peerId, sendCell.id, function onClick(message) {
                 if (message.length > 0) {
                   channel.send(message);
@@ -31,11 +27,11 @@
             };
 
             peer.onMessageReceived = function(peerId, message) {
-              var newText = document.createTextNode(message);
-              var paragraph = document.createElement("div");
+              var newText = document.createTextNode("from peer " + peerId + ": " + message);
+              var paragraph = document.createElement("p");
               paragraph.appendChild(newText);
 
-              var messages = document.getElementById("messages_" + peerId);
+              var messages = document.getElementById("messages");
               messages.appendChild(paragraph);
             };
 
@@ -48,11 +44,10 @@
       <col width="160">
       <tr id="title_row"></tr>
       <tr id="send_row"></tr>
-      <tr>
-        <th>Messages received<th>
-      </tr>
-      <tr id="message_row"></tr>
     </table>
+
+    <h4>Messages received</h4>
+    <div id="messages"></div>
 </body>
 </html>
 
