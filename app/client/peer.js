@@ -49,6 +49,7 @@ function Peer() {
 
         _commChannel.onclose = function(evt) {
             console.log("dataChannel closed");
+            self.onChannelClosed(peerId);
         };
 
         _commChannel.onerror = function(evt) {
@@ -99,8 +100,13 @@ function Peer() {
           console.log("channel received");
           self.onChannelOpened(peerId, receiveChannel);
           window.channel = receiveChannel;
+
           receiveChannel.onmessage = function(event){
-            self.onMessageReceived(peerId, event.data);
+              self.onMessageReceived(peerId, event.data);
+          };
+
+          receiveChannel.onclose = function(evt) {
+              self.onChannelClosed(peerId);
           };
         };
 
@@ -128,6 +134,11 @@ function Peer() {
     //default handler, should be overriden 
     this.onChannelOpened = function(peerId, receiveChanned) {
         console.log("on channel opened");
+    };
+
+    //default handler, should be overriden 
+    this.onChannelClosed = function(peerId) {
+        console.log("on channel closed");
     };
 
     //default handler, should be overriden 
