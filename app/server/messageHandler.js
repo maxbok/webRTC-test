@@ -32,11 +32,17 @@ function onInit(ws){
     ws.id = id;
     connectedPeers[id] = ws;
 
-    message = {};
-    message.type = "attest_registration";
-    message.peerId = id;
-    message.otherPeers = Object.keys(connectedPeers);
-    ws.send(JSON.stringify(message));
+    var peers = Object.keys(connectedPeers);
+    var index = peers.indexOf(id);
+    if (id > -1) {
+        peers.splice(index, 1);
+    }
+
+    ws.send(JSON.stringify({
+        type: 'attest_registration',
+        peerId: id,
+        otherPeers: peers
+    }));
 }
 
 function onOffer(offer, destination, source){
