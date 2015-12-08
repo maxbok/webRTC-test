@@ -3,6 +3,7 @@ function Peer() {
 
     var wsUri = "ws://localhost:8090/";
     var signalingChannel = createSignalingChannel(wsUri);
+    var peerChannels = []
 
     var self = this;
 
@@ -51,6 +52,7 @@ function Peer() {
         var channel = pc.createDataChannel('communication', {
             reliable: false
         });
+        peerChannels.push(channel);
 
         pc.createOffer(function(offer){
             pc.setLocalDescription(offer);
@@ -86,6 +88,8 @@ function Peer() {
 
         pc.ondatachannel = function(event) {
             var channel = event.channel;
+            peerChannels.push(channel);
+
             console.log("channel received");
             self.onChannelOpened(peerId, channel);
 
@@ -99,6 +103,12 @@ function Peer() {
         };
 
         return pc;
+    }
+
+    this.closeAllChannels = function() {
+        peerChannels.forEach(function(channel) {
+            channel.close();
+        });
     }
 
     //default handler, should be overriden 
