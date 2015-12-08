@@ -7,19 +7,41 @@ var WsMock = function(){
 };
 
 describe('signalingServer', function() {
-    describe('Initialization', function() {
-        it('onInit', function() {
-            var ws = new WsMock();
-            var message = {
+
+    describe('onInit', function() {
+
+        var message;
+        beforeEach(function() {
+            message = {
                 type:"init"
             };
+        });
+
+        it('sets the ws id and adds it to the connected peers', function() {
+            var ws = new WsMock();
             messageHandler.onMessage(ws, message);
 
-            var id = 0;
-            ws.id.should.be.equal(id);
-            messageHandler._connectedPeers[id].should.be.equal(ws);
+            ws.id.should.be.equal(0);
+            messageHandler._connectedPeers[0].should.be.equal(ws);
+        });
+
+        it('sends the list of the connected peers', function() {
+            ws1 = new WsMock();
+            ws1.id = 0;
+            ws2 = new WsMock();
+            ws2.id = 1;
+
+            messageHandler._connectedPeers[0] = ws1;
+
+            var spy = sinon.spy(ws2, "send");
+
+            messageHandler.onMessage(ws2, message);
+
+            var expectedResponse = '{"type":"attest_registration","peerId":1,"otherPeers":["0"]}';
+            spy.firstCall.args[0].should.eql(expectedResponse);
         });
     });
+
     describe('Messages', function() {
         var spy, ws1, ws2;
         beforeEach(function() {
@@ -76,4 +98,5 @@ describe('signalingServer', function() {
             spy.firstCall.args[0].should.eql(expectedResponse);
         });
     });
+
 });
