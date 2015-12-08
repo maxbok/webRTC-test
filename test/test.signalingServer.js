@@ -11,12 +11,13 @@ describe('signalingServer', function() {
         it('onInit', function() {
             var ws = new WsMock();
             var message = {
-                type:"init",
-                init:1
+                type:"init"
             };
-            messageHandler(ws, message);
-            ws.id.should.be.equal(1);
-            messageHandler._connectedPeers[1].should.be.equal(ws);
+            messageHandler.onMessage(ws, message);
+
+            var id = 0;
+            ws.id.should.be.equal(id);
+            messageHandler._connectedPeers[id].should.be.equal(ws);
         });
     });
     describe('Messages', function() {
@@ -26,7 +27,7 @@ describe('signalingServer', function() {
             ws1.id = 1;
             ws2 = new WsMock();
             ws2.id = 2;
-            
+
             messageHandler._connectedPeers[1] = ws1;
             messageHandler._connectedPeers[2] = ws2;
             spy = sinon.spy(messageHandler._connectedPeers[2], "send");
@@ -34,7 +35,7 @@ describe('signalingServer', function() {
         afterEach(function() {
             spy.restore();
         });
-        
+
         it('onOffer', function() {
             var offerSDP = "offer SDP";
             var message = {
@@ -42,7 +43,7 @@ describe('signalingServer', function() {
                 offer:offerSDP,
                 destination:2,
             };
-            messageHandler(ws1, message);
+            messageHandler.onMessage(ws1, message);
             spy.calledOnce.should.be.true;
 
             var expectedResponse = '{"type":"offer","offer":"offer SDP","source":1}';
@@ -55,7 +56,7 @@ describe('signalingServer', function() {
                 answer:answerSDP,
                 destination:2,
             };
-            messageHandler(ws1, message);
+            messageHandler.onMessage(ws1, message);
             spy.calledOnce.should.be.true;
 
             var expectedResponse = '{"type":"answer","answer":"answer SDP","source":1}';
@@ -68,7 +69,7 @@ describe('signalingServer', function() {
                 ICECandidate:ICECandidateSDP,
                 destination:2,
             };
-            messageHandler(ws1, message);
+            messageHandler.onMessage(ws1, message);
             spy.calledOnce.should.be.true;
 
             var expectedResponse = '{"type":"ICECandidate","ICECandidate":"ICECandidate SDP","source":1}';
